@@ -89,7 +89,7 @@ const Home = () => {
 			</Modal>
 			<main className="bg-[#353535] items-center">
 				<div className="flex flex-col ">
-					<div className="flex flex-row justify-center h-[8vh]">
+					<div className="flex flex-row justify-center desktop:h-[8vh] h-[10vh]">
 						<button
 							onClick={() => setModalIsOpen(true)}
 							className="absolute bg-blue-400 left-0 border-l-[0px] border-[1px] border-blue-900  p-2 my-[20px]  hover:bg-blue-400/30  rounded-r-md"
