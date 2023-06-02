@@ -92,7 +92,7 @@ const Home = () => {
 					<div className="flex flex-row justify-center desktop:h-[8vh] h-[10vh]">
 						<button
 							onClick={() => setModalIsOpen(true)}
-							className="absolute bg-blue-400 left-0 border-l-[0px] border-[1px] border-blue-900  p-2 my-[20px]  hover:bg-blue-400/30  rounded-r-md"
+							className="absolute text-black bg-blue-400 left-0 border-l-[0px] border-[1px] border-blue-900  p-2 my-[20px]  hover:bg-blue-400/30  rounded-r-md"
 						>
 							Agregar Cámara +
 						</button>
@@ -122,7 +122,7 @@ const Home = () => {
 								);
 								setCurrentCamera(cameras[0]);
 							}}
-							className="absolute bg-red-400 right-0 border-r-[0px] border-[1px] border-red-900  p-2 my-[20px]  hover:bg-red-400/30  rounded-l-md"
+							className="absolute text-black bg-red-400 right-0 border-r-[0px] border-[1px] border-red-900  p-2 my-[20px]  hover:bg-red-400/30  rounded-l-md"
 						>
 							Eliminar Cámara
 						</button>
@@ -131,8 +131,10 @@ const Home = () => {
 						return (
 							<iframe
 								key={camera}
-								src={`http://localhost:3000/cameras/${camera}`}
-								className={`h-[92vh] ${currentCamera !== camera && "hidden"}`}
+								src={`http://localhost:3001/cameras/${camera}`}
+								className={`desktop:h-[92vh] h-[90vh] ${
+									currentCamera !== camera && "hidden"
+								}`}
 								width="100%"
 								height="100%"
 								frameBorder="0"
