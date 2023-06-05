@@ -3,8 +3,8 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 const Home = () => {
-	const hostname =
-		process.env.NEXT_PUBLIC_IP + ":" + process.env.NEXT_PUBLIC_CLIENT_PORT;
+	const clientPort = 3001;
+	const [hostname, setHostname] = useState(null);
 	const [cameras, setCameras] = useState(null);
 	const [currentCamera, setCurrentCamera] = useState("Camara 1");
 
@@ -26,6 +26,7 @@ const Home = () => {
 	};
 
 	useEffect(() => {
+		setHostname(window.location.hostname);
 		// Fetch cameras from a local file through an API route when the component mounts
 		let camerasToSet = [];
 
@@ -44,7 +45,7 @@ const Home = () => {
 	}, [cameras]);
 
 	// If cameras is null, show a loading message
-	if (cameras == null) {
+	if (cameras == null || hostname == null) {
 		return (
 			<div className="w-screen h-screen flex flex-col justify-center items-center">
 				<h1 className="text-[40px] font-bold">Cargando Cámaras</h1>
@@ -133,7 +134,7 @@ const Home = () => {
 						return (
 							<iframe
 								key={camera}
-								src={`http://${hostname}/cameras/${camera}`}
+								src={`http://${hostname}:${clientPort}/cameras/${camera}`}
 								className={`desktop:h-[92vh] h-[90vh] ${
 									currentCamera !== camera && "hidden"
 								}`}

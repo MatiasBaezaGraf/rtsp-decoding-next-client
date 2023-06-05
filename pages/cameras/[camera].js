@@ -1,10 +1,12 @@
+import { set } from "browser-cookies";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useRef, useEffect } from "react";
 
 const Player = () => {
 	const serverPort = process.env.NEXT_PUBLIC_SERVER_PORT;
-	const ip = process.env.NEXT_PUBLIC_IP;
+	// State to keep track of the IP address of the server where the whole system is running
+	const [ip, setIp] = useState(null);
 
 	const router = useRouter();
 	// State to keep track of whether the client is connected to a stream or not
@@ -32,11 +34,8 @@ const Player = () => {
 	const videoCanvasRef = useRef(null);
 	let animationFrameId = null;
 
-	const stopAnimationLoop = () => {
-		cancelAnimationFrame(animationFrameId);
-	};
-
 	useEffect(() => {
+		setIp(window.location.hostname);
 		let previousTimestamp = 0;
 		const interval = 1000; // Set your desired interval in milliseconds
 
@@ -88,25 +87,25 @@ const Player = () => {
 			}
 		};
 
-		// copyCanvas();
-
-		fetch(`http://${ip}:${serverPort}/status`, {
-			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
-			.then(async (response) => {
-				if (response.status == 200) {
-					setServerOnline(true);
-				} else {
-					setServerOnline(false);
-				}
+		if (ip != null) {
+			fetch(`http://${ip}:${serverPort}/status`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
 			})
-			.catch((err) => {
-				setServerOnline(false);
-				console.error(err);
-			});
+				.then(async (response) => {
+					if (response.status == 200) {
+						setServerOnline(true);
+					} else {
+						setServerOnline(false);
+					}
+				})
+				.catch((err) => {
+					setServerOnline(false);
+					console.error(err);
+				});
+		}
 
 		if (histogram || vectorscope || waveform) {
 			console.log("Starting animation");
@@ -120,7 +119,7 @@ const Player = () => {
 			console.log("Cleanup");
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [histogram, vectorscope, waveform]);
+	}, [histogram, vectorscope, waveform, ip]);
 
 	const renderHistogramAndVectorscope = (pixels) => {
 		// Histogram canvases and contexts
