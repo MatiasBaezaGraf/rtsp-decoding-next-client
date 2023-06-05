@@ -35,7 +35,6 @@ const Player = () => {
 	let animationFrameId = null;
 
 	useEffect(() => {
-		checkParams();
 		setIp(window.location.hostname);
 		let previousTimestamp = 0;
 		const interval = 1000; // Set your desired interval in milliseconds
@@ -106,6 +105,8 @@ const Player = () => {
 					setServerOnline(false);
 					console.error(err);
 				});
+
+			checkParams();
 		}
 
 		if (histogram || vectorscope || waveform) {
@@ -534,14 +535,6 @@ const Player = () => {
 						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
 						value={port}
 					/>
-					<button
-						onClick={updateCameraList}
-						className={`bg-white border-black border-[1px] text-black  rounded-md p-2 m-2 hover:bg-white/80 ${
-							!serverOnline && "bg-white/30 text-black hover:bg-white/30"
-						}`}
-					>
-						test
-					</button>
 					{!connected ? (
 						<button
 							onClick={startProcessAndConnect}
