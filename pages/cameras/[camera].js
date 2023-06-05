@@ -480,6 +480,10 @@ const Player = () => {
 		}
 	};
 
+	console.log(router.query);
+	console.log(router.query.stream);
+	console.log(router.query.port);
+
 	return (
 		<>
 			<Head>
