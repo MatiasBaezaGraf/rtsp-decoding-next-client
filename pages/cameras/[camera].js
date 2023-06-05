@@ -35,6 +35,7 @@ const Player = () => {
 	let animationFrameId = null;
 
 	useEffect(() => {
+		checkParams();
 		setIp(window.location.hostname);
 		let previousTimestamp = 0;
 		const interval = 1000; // Set your desired interval in milliseconds
@@ -120,178 +121,6 @@ const Player = () => {
 			cancelAnimationFrame(animationFrameId);
 		};
 	}, [histogram, vectorscope, waveform, ip]);
-
-	const renderHistogramAndVectorscope = (pixels) => {
-		// Histogram canvases and contexts
-		const canvasGrayscale = document.getElementById("grayscale");
-		const contextGrayscale = canvasGrayscale.getContext("2d");
-
-		const canvasRed = document.getElementById("red");
-		const contextRed = canvasRed.getContext("2d");
-
-		const canvasGreen = document.getElementById("green");
-		const contextGreen = canvasGreen.getContext("2d");
-
-		const canvasBlue = document.getElementById("blue");
-		const contextBlue = canvasBlue.getContext("2d");
-
-		const histogramHeight = canvasRed.height;
-
-		// Clear the canvas (histogram)
-		contextRed.clearRect(0, 0, canvasRed.width, canvasRed.height);
-		contextGreen.clearRect(0, 0, canvasGreen.width, canvasGreen.height);
-		contextBlue.clearRect(0, 0, canvasBlue.width, canvasBlue.height);
-		contextGrayscale.clearRect(
-			0,
-			0,
-			canvasGrayscale.width,
-			canvasGrayscale.height
-		);
-
-		// Vectorscope canvas and context
-		const canvas = document.getElementById("colorWheelCanvas");
-		const context = canvas.getContext("2d");
-		const colorWheelImg = document.getElementById("colorWheelImg");
-
-		// Draw the color wheel to clear the canvas
-		context.drawImage(colorWheelImg, 0, 0, 500, 500);
-
-		// Calculate color distribution (histogram)
-		const distribution = {
-			red: new Array(256).fill(0),
-			green: new Array(256).fill(0),
-			blue: new Array(256).fill(0),
-			grayscale: new Array(256).fill(0),
-		};
-
-		for (let i = 0; i < pixels.length; i += 12) {
-			const r = pixels[i];
-			const g = pixels[i + 1];
-			const b = pixels[i + 2];
-
-			// Calculate the grayscale value for the pixel
-			const grayscale = Math.round((r + g + b) / 3);
-
-			// Increment the respective channel count in the distribution (histogram)
-			distribution.red[r]++;
-			distribution.green[g]++;
-			distribution.blue[b]++;
-			distribution.grayscale[grayscale]++;
-
-			// Calculate the hue
-			let red = r / 255;
-			let green = g / 255;
-			let blue = b / 255;
-
-			const max = Math.max(red, green, blue);
-			const min = Math.min(red, green, blue);
-
-			let hue;
-
-			if (max === min) {
-				hue = 0; // achromatic (gray)
-			} else {
-				const delta = max - min;
-				if (max === red) {
-					hue = ((green - blue) / delta) % 6;
-				} else if (max === green) {
-					hue = (blue - red) / delta + 2;
-				} else {
-					hue = (red - green) / delta + 4;
-				}
-				hue = (hue * 60 + 360) % 360; // convert to degrees
-			}
-
-			//Vectorscope
-			//Calculate the saturation
-			const saturation = (max === 0 ? 0 : (max - min) / max) * 100;
-
-			//Calculate the value
-			const value = max * 100;
-
-			//Get the canvas center
-			const centerX = canvas.width / 2;
-			const centerY = canvas.height / 2;
-
-			//Convert the polar coordinates to cartesian coordinates
-			const angleInRadians = hue * (Math.PI / 180);
-
-			const endX = centerX - saturation * 2 * Math.sin(angleInRadians);
-			const endY = centerY - saturation * 2 * Math.cos(angleInRadians);
-
-			//Plot the vectorscope
-			context.beginPath();
-			context.moveTo(endX, endY); // Starting point (center of the canvas)
-			context.lineTo(endX, endY + 0.06); // Endpoint calculated based on angle and distance
-			context.strokeStyle = "white"; // Set line color
-			context.lineWidth = 1; // Set line width
-			context.stroke(); // Draw the line
-		}
-
-		// Find the maximum count in the distribution for scaling
-		const redMaxCount = Math.max(...distribution.red);
-		const greenMaxCount = Math.max(...distribution.green);
-		const blueMaxCount = Math.max(...distribution.blue);
-		const grayscaleMaxCount = Math.max(...distribution.grayscale);
-
-		// Calculate the scaling factor for histogram height
-		const redScalingFactor = histogramHeight / redMaxCount;
-		const greenScalingFactor = histogramHeight / greenMaxCount;
-		const blueScalingFactor = histogramHeight / blueMaxCount;
-		const grayscaleScalingFactor = histogramHeight / grayscaleMaxCount;
-
-		// Plot the histogram
-		for (let i = 0; i < 256; i = i + 1) {
-			const x = i;
-
-			const redHeight = distribution.red[i] * redScalingFactor;
-			const greenHeight = distribution.green[i] * greenScalingFactor;
-			const blueHeight = distribution.blue[i] * blueScalingFactor;
-			const grayscaleHeight =
-				distribution.grayscale[i] * grayscaleScalingFactor;
-
-			// Calculate the height of the next bar in the histogram
-			// This is used to draw the line from the current bar to the next bar
-			const nextRedHeight = distribution.red[i + 1] * redScalingFactor;
-			const nextGreenHeight = distribution.green[i + 1] * greenScalingFactor;
-			const nextBlueHeight = distribution.blue[i + 1] * blueScalingFactor;
-			const nextGrayscaleHeight =
-				distribution.grayscale[i + 1] * grayscaleScalingFactor;
-
-			// Draw the vertical lines for each channel
-
-			contextRed.strokeStyle = "red";
-			contextRed.beginPath();
-			contextRed.moveTo(x * 2, histogramHeight);
-			contextRed.lineTo(x * 2, histogramHeight - redHeight);
-			contextRed.lineTo((x + 1) * 2, histogramHeight - nextRedHeight);
-			contextRed.stroke();
-
-			contextGreen.strokeStyle = "green";
-			contextGreen.beginPath();
-			contextGreen.moveTo(x * 2, histogramHeight);
-			contextGreen.lineTo(x * 2, histogramHeight - greenHeight);
-			contextGreen.lineTo((x + 1) * 2, histogramHeight - nextGreenHeight);
-			contextGreen.stroke();
-
-			contextBlue.strokeStyle = "blue";
-			contextBlue.beginPath();
-			contextBlue.moveTo(x * 2, histogramHeight);
-			contextBlue.lineTo(x * 2, histogramHeight - blueHeight);
-			contextBlue.lineTo((x + 1) * 2, histogramHeight - nextBlueHeight);
-			contextBlue.stroke();
-
-			contextGrayscale.strokeStyle = "white";
-			contextGrayscale.beginPath();
-			contextGrayscale.moveTo(x * 2, histogramHeight);
-			contextGrayscale.lineTo(x * 2, histogramHeight - grayscaleHeight);
-			contextGrayscale.lineTo(
-				(x + 1) * 2,
-				histogramHeight - nextGrayscaleHeight
-			);
-			contextGrayscale.stroke();
-		}
-	};
 
 	const renderMultiRGBHistogram = (pixels) => {
 		const canvasGrayscale = document.getElementById("grayscale");
@@ -566,6 +395,8 @@ const Player = () => {
 			setPlayer(new JSMpeg.Player(url, { canvas: canvas, disableGl: true }));
 			setProcessId(processId);
 			setErrorMessage("");
+
+			updateCameraList();
 		} else if (response.status == 400) {
 			// If the process failed to start, the error message is set and displayed to the user
 			console.error(`Error: ${response.status} - ${responseText}`);
@@ -599,6 +430,52 @@ const Player = () => {
 			player.destroy();
 			setPlayer(null);
 			clearCanvas();
+		}
+	};
+
+	//This function is called when the user clicks the "Connect" button and the connection is successful
+	//It updates the camera list and sets the stream and ports in the cameras.json files, so the next time
+	//the user opens the app, the stream and port are already set
+	const updateCameraList = async () => {
+		const camerasResponse = await fetch("/api/cameras");
+		const camerasJson = await camerasResponse.json();
+		const cameras = camerasJson.cameras;
+
+		const newStream = stream;
+		const newPort = port;
+
+		cameras.forEach((camera) => {
+			if (camera.name == router.query.camera) {
+				camera.stream = newStream;
+				camera.port = newPort;
+			}
+		});
+
+		fetch("/api/cameras", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ cameras: cameras }),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+			});
+	};
+
+	//This function is called every time the component is rendered. It checks if the stream and port are in the URL
+	//and sets them in the state
+	const checkParams = () => {
+		if (router.query.port) {
+			setPort(router.query.port);
+		}
+
+		if (router.query.stream) {
+			setStream(router.query.stream);
 		}
 	};
 
@@ -647,6 +524,7 @@ const Player = () => {
 						disabled={connected}
 						placeholder="Stream URL"
 						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
+						value={stream}
 					/>
 					<input
 						onChange={(e) => setPort(e.target.value)}
@@ -654,7 +532,16 @@ const Player = () => {
 						disabled={connected}
 						placeholder="Port"
 						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
+						value={port}
 					/>
+					<button
+						onClick={updateCameraList}
+						className={`bg-white border-black border-[1px] text-black  rounded-md p-2 m-2 hover:bg-white/80 ${
+							!serverOnline && "bg-white/30 text-black hover:bg-white/30"
+						}`}
+					>
+						test
+					</button>
 					{!connected ? (
 						<button
 							onClick={startProcessAndConnect}

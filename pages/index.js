@@ -11,6 +11,19 @@ const Home = () => {
 	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [cameraName, setCameraName] = useState("");
 
+	const confirmCamera = () => {
+		const camera = {
+			name: cameraName,
+			stream: "",
+			port: "",
+		};
+		// Add the new camera to the cameras array and reset the input value
+		setCameras([...cameras, camera]);
+		setCurrentCamera(camera);
+		setCameraName("");
+		setModalIsOpen(false);
+	};
+
 	const updateCameras = () => {
 		fetch("/api/cameras", {
 			method: "POST",
@@ -27,6 +40,7 @@ const Home = () => {
 
 	useEffect(() => {
 		setHostname(window.location.hostname);
+
 		// Fetch cameras from a local file through an API route when the component mounts
 		let camerasToSet = [];
 
@@ -75,15 +89,14 @@ const Home = () => {
 						className="border-[1px] border-black rounded-md p-[10px] w-[100%] mt-[20px] bg-[#031830] text-white"
 						value={cameraName}
 						onChange={(e) => setCameraName(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								confirmCamera();
+							}
+						}}
 					/>
 					<button
-						onClick={() => {
-							// Add the new camera to the cameras array and reset the input value
-							setCameras([...cameras, cameraName]);
-							setCurrentCamera(cameraName);
-							setCameraName("");
-							setModalIsOpen(false);
-						}}
+						onClick={confirmCamera}
 						className="border-[1px] border-black rounded-md p-[10px] w-[100%] mt-[20px] hover:bg-black/30"
 					>
 						Confirmar
@@ -103,7 +116,7 @@ const Home = () => {
 						{cameras.map((camera, index) => {
 							return (
 								<button
-									key={camera}
+									key={index}
 									onClick={() => setCurrentCamera(camera)}
 									className={`border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30  ${
 										currentCamera === camera &&
@@ -112,7 +125,7 @@ const Home = () => {
 										!cameras[index + 1] && "rounded-r-md"
 									}`}
 								>
-									{camera}
+									{camera.name}
 								</button>
 							);
 						})}
@@ -130,11 +143,11 @@ const Home = () => {
 							Eliminar Cámara
 						</button>
 					</div>
-					{cameras.map((camera) => {
+					{cameras.map((camera, index) => {
 						return (
 							<iframe
-								key={camera}
-								src={`http://${hostname}:${clientPort}/cameras/${camera}`}
+								key={index}
+								src={`http://${hostname}:${clientPort}/cameras/${camera.name}?stream=${camera.stream}&port=${camera.port}`}
 								className={`desktop:h-[92vh] h-[90vh] ${
 									currentCamera !== camera && "hidden"
 								}`}

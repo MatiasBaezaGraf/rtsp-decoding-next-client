@@ -1,0 +1,19 @@
+{
+  "cameras": [
+    {
+      "name": "Camera 1",
+      "stream": "",
+      "port": ""
+    },
+    {
+      "name": "Camera 2",
+      "stream": "",
+      "port": ""
+    },
+    {
+      "name": "Cam 3",
+      "stream": "",
+      "port": ""
+    }
+  ]
+}
