@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useState, useRef, useEffect } from "react";
 
 const Player = () => {
-	const host = process.env.NEXT_PUBLIC_HOST;
+	const serverPort = process.env.NEXT_PUBLIC_SERVER_PORT;
 	const ip = process.env.NEXT_PUBLIC_IP;
 
 	const router = useRouter();
@@ -90,7 +90,7 @@ const Player = () => {
 
 		// copyCanvas();
 
-		fetch(`http://${host}/status`, {
+		fetch(`http://${ip}:${serverPort}/status`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -546,7 +546,7 @@ const Player = () => {
 	};
 
 	const startProcessAndConnect = async () => {
-		const response = await fetch(`http://${host}/startProcess`, {
+		const response = await fetch(`http://${ip}:${serverPort}/startProcess`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -579,7 +579,7 @@ const Player = () => {
 	};
 
 	const stopProcess = async () => {
-		const response = await fetch(`http://${host}/stopProcess`, {
+		const response = await fetch(`http://${ip}:${serverPort}/stopProcess`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

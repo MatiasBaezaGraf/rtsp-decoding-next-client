@@ -3,7 +3,8 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 const Home = () => {
-	const hostname = process.env.NEXT_PUBLIC_HOST;
+	const hostname =
+		process.env.NEXT_PUBLIC_IP + ":" + process.env.NEXT_PUBLIC_CLIENT_PORT;
 	const [cameras, setCameras] = useState(null);
 	const [currentCamera, setCurrentCamera] = useState("Camara 1");
 
