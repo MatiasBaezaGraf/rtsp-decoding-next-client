@@ -35,7 +35,17 @@ const Player = () => {
 	let animationFrameId = null;
 
 	useEffect(() => {
+		// Set the IP address of the server
+		// This is used to determine whether the server is online or not
 		setIp(window.location.hostname);
+
+		// Set the port and stream name, if any
+		setPort(router.query.port);
+		setStream(router.query.stream);
+
+		// The interval is defined to render the scopes at a fixed rate
+		// This is done to avoid rendering the scopes at a very high rate
+		// which would cause the performance to drop significantly
 		let previousTimestamp = 0;
 		const interval = 1000; // Set your desired interval in milliseconds
 
@@ -88,25 +98,7 @@ const Player = () => {
 		};
 
 		if (ip != null) {
-			fetch(`http://${ip}:${serverPort}/status`, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			})
-				.then(async (response) => {
-					if (response.status == 200) {
-						setServerOnline(true);
-					} else {
-						setServerOnline(false);
-					}
-				})
-				.catch((err) => {
-					setServerOnline(false);
-					console.error(err);
-				});
-
-			checkParams();
+			checkServerStatus();
 		}
 
 		if (histogram || vectorscope || waveform) {
@@ -121,7 +113,14 @@ const Player = () => {
 			console.log("Cleanup");
 			cancelAnimationFrame(animationFrameId);
 		};
-	}, [histogram, vectorscope, waveform, ip]);
+	}, [
+		histogram,
+		vectorscope,
+		waveform,
+		ip,
+		router.query.port,
+		router.query.stream,
+	]);
 
 	const renderMultiRGBHistogram = (pixels) => {
 		const canvasGrayscale = document.getElementById("grayscale");
@@ -468,21 +467,25 @@ const Player = () => {
 			});
 	};
 
-	//This function is called every time the component is rendered. It checks if the stream and port are in the URL
-	//and sets them in the state
-	const checkParams = () => {
-		if (router.query.port) {
-			setPort(router.query.port);
-		}
-
-		if (router.query.stream) {
-			setStream(router.query.stream);
-		}
+	const checkServerStatus = async () => {
+		fetch(`http://${ip}:${serverPort}/status`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		})
+			.then(async (response) => {
+				if (response.status == 200) {
+					setServerOnline(true);
+				} else {
+					setServerOnline(false);
+				}
+			})
+			.catch((err) => {
+				setServerOnline(false);
+				console.error(err);
+			});
 	};
-
-	console.log(router.query);
-	console.log(router.query.stream);
-	console.log(router.query.port);
 
 	return (
 		<>

@@ -2,8 +2,8 @@
   "cameras": [
     {
       "name": "Camera 1",
-      "stream": "",
-      "port": ""
+      "stream": "asda",
+      "port": "1231"
     },
     {
       "name": "Camera 2",
