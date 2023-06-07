@@ -13,6 +13,7 @@ const Player = () => {
 	// This is used to determine whether to show the "Connect" or "Disconnect" button
 	// and to determine whether to show the video player or not
 	const [connected, setConnected] = useState(false);
+	const [disableDisconnect, setDisableDisconnect] = useState(true);
 
 	// State to keep track of whether the server is online or not
 	const [serverOnline, setServerOnline] = useState(false);
@@ -21,8 +22,8 @@ const Player = () => {
 	// if there is an error connecting to the stream
 	const [errorMessage, setErrorMessage] = useState("");
 
-	const [stream, setStream] = useState("");
-	const [port, setPort] = useState("");
+	const [stream, setStream] = useState(undefined);
+	const [port, setPort] = useState(undefined);
 
 	const [player, setPlayer] = useState(null);
 	const [processId, setProcessId] = useState(null);
@@ -39,9 +40,14 @@ const Player = () => {
 		// This is used to determine whether the server is online or not
 		setIp(window.location.hostname);
 
-		// Set the port and stream name, if any
-		setPort(router.query.port);
-		setStream(router.query.stream);
+		// Set the port and stream name from the URL query parameters if they are not set and
+		// if they are present in the URL query parameters
+		if (stream == undefined) {
+			setStream(router.query.stream);
+		}
+		if (port == undefined) {
+			setPort(router.query.port);
+		}
 
 		// The interval is defined to render the scopes at a fixed rate
 		// This is done to avoid rendering the scopes at a very high rate
@@ -101,9 +107,19 @@ const Player = () => {
 			checkServerStatus();
 		}
 
+		// Only if the histogram, vectorscope, or waveform buttons are enabled, start the animation loop
+		// and render the selected scopes
 		if (histogram || vectorscope || waveform) {
 			console.log("Starting animation");
 			animationFrameId = requestAnimationFrame(copyCanvas);
+		}
+
+		// This function is called when the user clicks the "Connect" button
+		// It checks if the server is online and if the stream is valid
+		if (connected) {
+			setTimeout(() => {
+				confirmProcess();
+			}, 500);
 		}
 
 		return () => {
@@ -118,6 +134,7 @@ const Player = () => {
 		vectorscope,
 		waveform,
 		ip,
+		connected,
 		router.query.port,
 		router.query.stream,
 	]);
@@ -373,6 +390,32 @@ const Player = () => {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 	};
 
+	// This function checks if the started process runs or crashed
+	// If it doesn't run, it will reset all the states and show an error message
+	const confirmProcess = async () => {
+		const processConfirmed = await fetch(`http://${ip}:${serverPort}/process`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ processId: processId }),
+		});
+
+		const processConfirmedText = await processConfirmed.text();
+
+		if (processConfirmed.status == 200) {
+			console.log(processConfirmedText);
+			setDisableDisconnect(false);
+		} else {
+			console.error(processConfirmedText);
+			setErrorMessage("Error del servidor: Verifique el URL del stream");
+			setConnected(false);
+			setPlayer(null);
+			if (player != null) player.destroy();
+			clearCanvas();
+		}
+	};
+
 	const startProcessAndConnect = async () => {
 		const response = await fetch(`http://${ip}:${serverPort}/startProcess`, {
 			method: "POST",
@@ -395,7 +438,6 @@ const Player = () => {
 			setPlayer(new JSMpeg.Player(url, { canvas: canvas, disableGl: true }));
 			setProcessId(processId);
 			setErrorMessage("");
-
 			updateCameraList();
 		} else if (response.status == 400) {
 			// If the process failed to start, the error message is set and displayed to the user
@@ -467,6 +509,9 @@ const Player = () => {
 			});
 	};
 
+	// This fuction is called when the page is loaded
+	// It checks if the server is online to display the correct message to the user
+	// and to enable or disable the "Connect" button
 	const checkServerStatus = async () => {
 		fetch(`http://${ip}:${serverPort}/status`, {
 			method: "GET",
@@ -530,7 +575,7 @@ const Player = () => {
 						onChange={(e) => setStream(e.target.value)}
 						type="text"
 						disabled={connected}
-						placeholder="Stream URL"
+						placeholder="URL del Stream"
 						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
 						value={stream}
 					/>
@@ -538,29 +583,35 @@ const Player = () => {
 						onChange={(e) => setPort(e.target.value)}
 						type="text"
 						disabled={connected}
-						placeholder="Port"
+						placeholder="Puerto"
 						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
 						value={port}
 					/>
+
 					{!connected ? (
 						<button
-							onClick={startProcessAndConnect}
+							onClick={() => {
+								startProcessAndConnect();
+							}}
 							disabled={!serverOnline}
 							className={`bg-white border-black border-[1px] text-black  rounded-md p-2 m-2 hover:bg-white/80 ${
 								!serverOnline && "bg-white/30 text-black hover:bg-white/30"
 							}`}
 						>
-							Connect
+							Conectar
 						</button>
 					) : (
 						<button
-							onClick={stopProcess}
-							disabled={!serverOnline}
+							onClick={() => {
+								setDisableDisconnect(true);
+								stopProcess();
+							}}
+							disabled={disableDisconnect}
 							className={`bg-white  border-black  border-[1px] text-black rounded-md p-2 m-2 hover:bg-white/80 ${
 								!serverOnline && "bg-white/30 text-black hover:bg-white/30"
 							}`}
 						>
-							Disconnect
+							Desconectar
 						</button>
 					)}
 				</div>
@@ -580,7 +631,7 @@ const Player = () => {
 								: "border-b-[4px] mt-[2px] bg-[#474747]"
 						} text-white rounded-l-md`}
 					>
-						Histogram
+						Histograma
 					</button>
 
 					<button
@@ -591,7 +642,7 @@ const Player = () => {
 								: "border-b-[4px] mt-[2px] bg-[#474747]"
 						} text-white`}
 					>
-						Vectorscope
+						Vectorscopio
 					</button>
 
 					<button
@@ -602,7 +653,7 @@ const Player = () => {
 								: "border-b-[4px] mt-[2px] bg-[#474747]"
 						} text-white rounded-r-md`}
 					>
-						Waveform
+						Forma de onda
 					</button>
 				</div>
 				<div className="flex flex-row justify-center">
