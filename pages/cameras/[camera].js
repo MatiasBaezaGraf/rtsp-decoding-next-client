@@ -1,4 +1,4 @@
-import { set } from "browser-cookies";
+import Play from "@/components/Play";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useRef, useEffect } from "react";
@@ -26,6 +26,9 @@ const Player = () => {
 	const [port, setPort] = useState(undefined);
 
 	const [player, setPlayer] = useState(null);
+	const [pause, setPause] = useState(false);
+	const [fullscreen, setFullscreen] = useState(false);
+
 	const [processId, setProcessId] = useState(null);
 
 	const [histogram, setHistogram] = useState(false);
@@ -462,12 +465,14 @@ const Player = () => {
 		// If the process stopped successfully, set the connected state to false, destroy the player object for it to stop looking for a stream
 		if (response.status == 200) {
 			console.log(await response.text());
+			setPause(false);
 			setConnected(false);
 			player.destroy();
 			setPlayer(null);
 			clearCanvas();
 		} else {
 			console.log(`Status ${response.status} - ${await response.text()}`);
+			setPause(false);
 			setConnected(false);
 			player.destroy();
 			setPlayer(null);
@@ -532,6 +537,28 @@ const Player = () => {
 			});
 	};
 
+	const playAndPause = () => {
+		if (player != null) {
+			if (player.isPlaying) {
+				setPause(true);
+				player.pause();
+			} else {
+				setPause(false);
+				player.play();
+			}
+		}
+	};
+
+	const fullScreen = () => {
+		if (fullscreen) {
+			document.exitFullscreen();
+			setFullscreen(false);
+		} else {
+			document.getElementById("video").requestFullscreen();
+			setFullscreen(true);
+		}
+	};
+
 	return (
 		<>
 			<Head>
@@ -545,7 +572,10 @@ const Player = () => {
 				<h1 className="text-3xl font-bold pt-[20px] text-white">
 					{router.query.camera}
 				</h1>
-				<div className="relative border-[1px] border-[#222222] my-[20px]">
+				<div
+					id="video"
+					className="relative border-[1px] border-[#222222] my-[20px] w-[800px] h-[450px]"
+				>
 					<div
 						className={`absolute top-0 left-0 w-full h-full flex flex-col justify-center text-center bg-[#626262] z-20 ${
 							connected ? "opacity-0" : "opacity-1"
@@ -556,27 +586,37 @@ const Player = () => {
 								serverOnline
 									? "border-green-600 bg-green-300/20 text-green-100"
 									: "border-red-600 bg-red-300/20 text-red-100"
-							}`}
+							} ${connected ? "hidden" : "block"}`}
 						>
 							{serverOnline ? "Server Online" : "Server Offline"}
 						</button>
 					</div>
 
+					<div
+						onDoubleClick={fullScreen}
+						onClick={playAndPause}
+						className={`absolute w-full h-full flex flex-col items-center justify-center z-30 transform duration-[300ms] ${
+							pause ? "opacity-1 scale-90" : "opacity-0 scale-100"
+						} ${connected && "cursor-pointer"}`}
+					>
+						<Play />
+					</div>
+
 					<canvas
 						ref={videoCanvasRef}
 						id="video-canvas"
-						className=" top-0 left-0 w-[800px] h-[450px] opacity-1"
-						width={800}
-						height={450}
+						className=" top-0 left-0 w-full h-full opacity-1"
+						width={1920}
+						height={1080}
 					></canvas>
 				</div>
-				<div className="flex flex-row items-center">
+				<div className="flex flex-row  items-center">
 					<input
 						onChange={(e) => setStream(e.target.value)}
 						type="text"
 						disabled={connected}
 						placeholder="URL del Stream"
-						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
+						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none w-[300px]"
 						value={stream}
 					/>
 					<input
@@ -584,7 +624,7 @@ const Player = () => {
 						type="text"
 						disabled={connected}
 						placeholder="Puerto"
-						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none"
+						className="border-2 border-[#696969] rounded-md p-2 m-2 text-white bg-[#474747] outline-none w-[100px]"
 						value={port}
 					/>
 
@@ -656,8 +696,11 @@ const Player = () => {
 						Forma de onda
 					</button>
 				</div>
+
+				{/* ----------------------------------------------------------- FROM HERE DOWN IS THE CODE FOR THE VIDEOSCOPES ----------------------------------------------------------- */}
+
 				<div className="flex flex-row justify-center">
-					{/* Histograms */}
+					{/* HISTOGRAMS */}
 					<div
 						className={`flex-col justify-center ${
 							histogram ? "block" : "hidden"
@@ -688,7 +731,7 @@ const Player = () => {
 							height={130}
 						/>
 					</div>
-					{/* Waveform  */}
+					{/* WAVEFORM  */}
 					<div className={`relative ${waveform ? "block" : "hidden"}`}>
 						<div className="absolute h-full w-full z-30 px-[30px] py-[40px] flex flex-col justify-between">
 							<hr className="bg-transparent border-stone-400/25 border-t-[1px] border-b-[0px]" />
@@ -726,7 +769,7 @@ const Player = () => {
 						/>
 					</div>
 				</div>
-				{/* Color Wheel */}
+				{/* VECTORSCOPE */}
 				<img
 					id="colorWheelImg"
 					src="/VectorScope.png"

@@ -2,12 +2,12 @@
   "cameras": [
     {
       "name": "Camera 1",
-      "stream": "rtsp://zephyr.rtsp.stream/pattern?streamKey=ecfdd285f363bec34f3c1419b442ba6b",
+      "stream": "rtsp://zephyr.rtsp.stream/movie?streamKey=ac9fb068a2cceba010fe907dd870430b",
       "port": "3333"
     },
     {
       "name": "Camera 2",
-      "stream": "asdasd",
+      "stream": "rtsp://zephyr.rtsp.stream/pattern?streamKey=ecfdd285f363bec34f3c1419b442ba6b",
       "port": "3335"
     },
     {
