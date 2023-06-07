@@ -1,3 +1,5 @@
+import FullScreen from "@/components/FullScreen";
+import Pause from "@/components/Pause";
 import Play from "@/components/Play";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -595,12 +597,34 @@ const Player = () => {
 					<div
 						onDoubleClick={fullScreen}
 						onClick={playAndPause}
-						className={`absolute w-full h-full flex flex-col items-center justify-center z-30 transform duration-[300ms] ${
+						className={`absolute w-full h-full flex flex-col items-center justify-center z-30 transform duration-[300ms]  ${
 							pause ? "opacity-1 scale-90" : "opacity-0 scale-100"
-						} ${connected && "cursor-pointer"}`}
+						}`}
 					>
-						<Play />
+						<Play color="#222222" />
 					</div>
+
+					<button
+						className={`absolute bottom-0 right-0 bg-transparent z-30 p-[10px] transform duration-[300ms] hover:scale-110 ${
+							connected ? "block" : "hidden"
+						}`}
+						onClick={fullScreen}
+					>
+						<FullScreen active={fullscreen} />
+					</button>
+
+					<button
+						className={`absolute bottom-0 left-0 bg-transparent z-30 p-[10px] transform duration-[300ms] hover:scale-110 ${
+							connected ? "block" : "hidden"
+						}`}
+						onClick={playAndPause}
+					>
+						{pause ? (
+							<Play size={30} color="#e3e3e1" />
+						) : (
+							<Pause size={30} color="#e3e3e1" />
+						)}
+					</button>
 
 					<canvas
 						ref={videoCanvasRef}
