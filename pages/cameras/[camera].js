@@ -689,10 +689,8 @@ const Player = () => {
 
 					<button
 						onClick={(e) => setHistogram(!histogram)}
-						className={` border-b-[#111111] p-[9px] ${
-							histogram
-								? "border-b-[2px] mt-[4px] bg-[#47709e]"
-								: "border-b-[4px] mt-[2px] bg-[#474747]"
+						className={` border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30  ${
+							histogram && "bg-black/30 text-stone-300 hover:bg-black/30"
 						} text-white rounded-l-md`}
 					>
 						Histograma
@@ -700,22 +698,18 @@ const Player = () => {
 
 					<button
 						onClick={(e) => setVectorscope(!vectorscope)}
-						className={` border-[#111111] border-x-[1px] border-x-[#585858]  p-[9px] ${
-							vectorscope
-								? "border-b-[2px] mt-[4px] bg-[#47709e]"
-								: "border-b-[4px] mt-[2px] bg-[#474747]"
-						} text-white`}
+						className={` border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30  ${
+							vectorscope && "bg-black/30 text-stone-300 hover:bg-black/30"
+						} text-white `}
 					>
 						Vectorscopio
 					</button>
 
 					<button
 						onClick={(e) => setWaveform(!waveform)}
-						className={` border-b-[#111111] p-[9px] ${
-							waveform
-								? "border-b-[2px] mt-[4px] bg-[#47709e]"
-								: "border-b-[4px] mt-[2px] bg-[#474747]"
-						} text-white rounded-r-md`}
+						className={` border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30  ${
+							waveform && "bg-black/30 text-stone-300 hover:bg-black/30"
+						} text-white  rounded-r-md`}
 					>
 						Forma de onda
 					</button>

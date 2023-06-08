@@ -62,7 +62,7 @@ const Home = () => {
 	if (cameras == null || hostname == null) {
 		return (
 			<div className="w-screen h-screen flex flex-col justify-center items-center">
-				<h1 className="text-[40px] font-bold">Cargando Cámaras</h1>
+				<h1 className="text-[40px] font-bold">Cargando</h1>
 			</div>
 		);
 	}
