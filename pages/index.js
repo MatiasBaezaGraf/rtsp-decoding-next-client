@@ -86,7 +86,7 @@ const Home = () => {
 					<input
 						type="text"
 						placeholder="Nombre de la cámara"
-						className="border-[1px] border-black rounded-md p-[10px] w-[100%] mt-[20px] bg-[#031830] text-white"
+						className="border-[1px] border-black rounded-md p-[10px] w-[100%] mt-[20px] bg-[#01050a] text-white"
 						value={cameraName}
 						onChange={(e) => setCameraName(e.target.value)}
 						onKeyDown={(e) => {
@@ -108,7 +108,7 @@ const Home = () => {
 					<div className="flex flex-row justify-center desktop:h-[8vh] h-[10vh]">
 						<button
 							onClick={() => setModalIsOpen(true)}
-							className="absolute text-black bg-blue-400 left-0 border-l-[0px] border-[1px] border-blue-900  p-2 my-[20px]  hover:bg-blue-400/30  rounded-r-md"
+							className="absolute flex flex-row items-center justify-center text-black bg-blue-400 left-0 border-l-[0px] border-[1px] border-blue-900  p-2 my-[20px]  hover:bg-blue-400/30  rounded-r-md"
 						>
 							Agregar Cámara +
 						</button>
@@ -118,7 +118,7 @@ const Home = () => {
 								<button
 									key={index}
 									onClick={() => setCurrentCamera(camera)}
-									className={`border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30  ${
+									className={`border-[1px] border-black  p-2 my-[20px]  hover:bg-black/30 flex flex-row items-center justify-center  ${
 										currentCamera === camera &&
 										"bg-black/30 text-stone-300 hover:bg-black/30"
 									} ${!cameras[index - 1] && "rounded-l-md"} ${
