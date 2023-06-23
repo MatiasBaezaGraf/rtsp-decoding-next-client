@@ -2,7 +2,7 @@ export default function handler(req, res) {
 	const { ip, port } = req.query;
 
 	if (req.method === "GET") {
-		fetch(`http://${ip}:${port}/status`, {
+		fetch(`http://${localhost}:${port}/status`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
