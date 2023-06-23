@@ -520,7 +520,29 @@ const Player = () => {
 	// It checks if the server is online to display the correct message to the user
 	// and to enable or disable the "Connect" button
 	const checkServerStatus = async () => {
-		fetch(`http://${ip}:${serverPort}/status`, {
+		// fetch(`http://${ip}:${serverPort}/status`, {
+		// 	method: "GET",
+		// 	headers: {
+		// 		"Content-Type": "application/json",
+		// 	},
+		// })
+		// 	.then(async (response) => {
+		// 		if (response.status == 200) {
+		// 			setServerOnline(true);
+		// 		} else {
+		// 			setServerOnline(false);
+		// 		}
+		// 	})
+		// 	.catch((err) => {
+		// 		setServerOnline(false);
+		// 		console.error(err);
+		// 	});
+		const url = new URL("/api/status", window.location.origin);
+
+		url.searchParams.append("ip", ip);
+		url.searchParams.append("port", serverPort);
+
+		fetch(url, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
