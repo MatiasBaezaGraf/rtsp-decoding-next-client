@@ -5,6 +5,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useRef, useEffect } from "react";
 
+// Every call is made through the API routes, which are defined in the pages/api folder
+// in order to communicate with the server, which is running on a closed port
+
 const Player = () => {
 	const serverPort = process.env.NEXT_PUBLIC_SERVER_PORT;
 	// State to keep track of the IP address of the server where the whole system is running
@@ -398,7 +401,11 @@ const Player = () => {
 	// This function checks if the started process runs or crashed
 	// If it doesn't run, it will reset all the states and show an error message
 	const confirmProcess = async () => {
-		const processConfirmed = await fetch(`http://${ip}:${serverPort}/process`, {
+		const url = new URL("/api/confirmProcess", window.location.origin);
+
+		url.searchParams.append("port", serverPort);
+
+		const processConfirmed = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -406,10 +413,10 @@ const Player = () => {
 			body: JSON.stringify({ processId: processId }),
 		});
 
-		const processConfirmedText = await processConfirmed.text();
+		const processConfirmedText = await processConfirmed.json();
 
 		if (processConfirmed.status == 200) {
-			console.log(processConfirmedText);
+			console.log(processConfirmedText.message);
 			setDisableDisconnect(false);
 		} else {
 			console.error(processConfirmedText);
@@ -422,7 +429,11 @@ const Player = () => {
 	};
 
 	const startProcessAndConnect = async () => {
-		const response = await fetch(`http://${ip}:${serverPort}/startProcess`, {
+		const url = new URL("/api/startProcess", window.location.origin);
+
+		url.searchParams.append("port", serverPort);
+
+		const response = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -435,7 +446,7 @@ const Player = () => {
 		if (response.status == 200) {
 			// If the process started successfully, connect to the stream and set the connected state to true
 			// Log the process ID
-			const processId = JSON.parse(responseText).processId;
+			const processId = JSON.parse(responseText);
 			console.log(`Process ID: ${processId}`);
 			setConnected(true);
 			let url = `ws://${ip}:${port}`;
@@ -456,7 +467,11 @@ const Player = () => {
 	};
 
 	const stopProcess = async () => {
-		const response = await fetch(`http://${ip}:${serverPort}/stopProcess`, {
+		const url = new URL("/api/stopProcess", window.location.origin);
+
+		url.searchParams.append("port", serverPort);
+
+		const response = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -520,26 +535,8 @@ const Player = () => {
 	// It checks if the server is online to display the correct message to the user
 	// and to enable or disable the "Connect" button
 	const checkServerStatus = async () => {
-		// fetch(`http://${ip}:${serverPort}/status`, {
-		// 	method: "GET",
-		// 	headers: {
-		// 		"Content-Type": "application/json",
-		// 	},
-		// })
-		// 	.then(async (response) => {
-		// 		if (response.status == 200) {
-		// 			setServerOnline(true);
-		// 		} else {
-		// 			setServerOnline(false);
-		// 		}
-		// 	})
-		// 	.catch((err) => {
-		// 		setServerOnline(false);
-		// 		console.error(err);
-		// 	});
 		const url = new URL("/api/status", window.location.origin);
 
-		url.searchParams.append("ip", ip);
 		url.searchParams.append("port", serverPort);
 
 		fetch(url, {

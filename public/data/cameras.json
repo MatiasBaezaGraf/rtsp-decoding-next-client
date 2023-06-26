@@ -8,7 +8,7 @@
     {
       "name": "Camera 2",
       "stream": "rtsp://zephyr.rtsp.stream/pattern?streamKey=ecfdd285f363bec34f3c1419b442ba6b",
-      "port": "3335"
+      "port": "3333"
     },
     {
       "name": "Cam 3",
