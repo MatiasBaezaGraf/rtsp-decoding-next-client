@@ -61,7 +61,7 @@ const Player = () => {
 		// This is done to avoid rendering the scopes at a very high rate
 		// which would cause the performance to drop significantly
 		let previousTimestamp = 0;
-		const interval = 1000; // Set your desired interval in milliseconds
+		const interval = 300; // Set your desired interval in milliseconds
 
 		const copyCanvas = (timestamp) => {
 			// Calculate the time difference since the last frame
@@ -269,7 +269,7 @@ const Player = () => {
 		context.drawImage(colorWheelImg, 0, 0, 500, 500);
 
 		// Analyze the pixels in the image from top-left to bottom-right by cols
-		for (let i = 0; i < pixels.length; i = i + 12) {
+		for (let i = 0; i < pixels.length; i = i + 24) {
 			const r = pixels[i + 0];
 			const g = pixels[i + 1];
 			const b = pixels[i + 2];
@@ -316,7 +316,7 @@ const Player = () => {
 
 			context.beginPath();
 			context.moveTo(endX, endY); // Starting point (center of the canvas)
-			context.lineTo(endX, endY + 0.06); // Endpoint calculated based on angle and distance
+			context.lineTo(endX, endY + 0.08); // Endpoint calculated based on angle and distance
 			context.strokeStyle = "white"; // Set line color
 			context.lineWidth = 1; // Set line width
 			context.stroke(); // Draw the line
@@ -339,8 +339,14 @@ const Player = () => {
 		// Analyze the pixels in the image from top-left to bottom-right by cols
 		let index = 0;
 
-		for (let col = 0; col < width; col += 2) {
-			for (let row = height - 1; row >= 0; row = row - 1) {
+		//Commented lines in the two for loops and the index at the bottom of the function are for
+		//renderind the waveform in better quality but it takes more time to render therefore
+		//if heavily affects the performance of the stream
+
+		for (let col = 0; col < width; col += 4) {
+			//for (let col = 0; col < width; col += 2) {
+			for (let row = height - 1; row >= 0; row = row - 2) {
+				//for (let row = height - 1; row >= 0; row = row - 1) {
 				//0 red, 1 green, 2 blue, 3 alpha
 				const red = pixels[row * (width * 4) + col * 4 + 0];
 				const green = pixels[row * (width * 4) + col * 4 + 1];
@@ -355,11 +361,12 @@ const Player = () => {
 				// Draw the line for the waveform sample
 				context.beginPath();
 				context.moveTo(index * sampleWidth, y);
-				context.lineTo(index * sampleWidth, y + 0.6);
+				context.lineTo(index * sampleWidth, y + 0.7);
 				context.stroke();
 				context.strokeStyle = "green";
 
-				index = index + 8;
+				//index = index + 8;
+				index = index + 32;
 			}
 		}
 	};
