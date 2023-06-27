@@ -61,7 +61,7 @@ const Player = () => {
 		// This is done to avoid rendering the scopes at a very high rate
 		// which would cause the performance to drop significantly
 		let previousTimestamp = 0;
-		const interval = 300; // Set your desired interval in milliseconds
+		const interval = 50; // Set your desired interval in milliseconds
 
 		const copyCanvas = (timestamp) => {
 			// Calculate the time difference since the last frame
