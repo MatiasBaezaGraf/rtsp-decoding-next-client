@@ -23,9 +23,9 @@ export default function handler(req, res) {
 			res.status(200).json({ message: "Cameras set/updated successfully" });
 		} catch (error) {
 			console.error(error);
-			res.status(500).json({ error: "Error updating cameras" });
+			res.status(500).json({ message: "Error updating cameras" });
 		}
 	} else {
-		res.status(405).json({ error: "Method not allowed" });
+		res.status(405).send("Method not allowed");
 	}
 }
