@@ -20,7 +20,7 @@ export default function handler(req, res) {
 
 			fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
-			res.status(200).json({ message: "Cameras set/updated successfully" });
+			res.status(200).send({ message: "Cameras set/updated successfully" });
 		} catch (error) {
 			console.error(error);
 			res.status(500).json({ message: "Error updating cameras" });
