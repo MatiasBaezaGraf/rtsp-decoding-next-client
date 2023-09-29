@@ -1,3 +1,4 @@
+import Decibelmeter from "@/components/Decibelmeter";
 import FullScreen from "@/components/FullScreen";
 import Pause from "@/components/Pause";
 import Play from "@/components/Play";
@@ -67,6 +68,7 @@ const Player = () => {
 			// Calculate the time difference since the last frame
 			const elapsed = timestamp - previousTimestamp;
 			if (elapsed >= interval) {
+				console.log("Volumen", player.volume);
 				// Get the canvas and context
 				const canvas = videoCanvasRef.current;
 				const context = canvas.getContext("2d");
@@ -596,10 +598,12 @@ const Player = () => {
 				<meta name="author" content="Matías Baeza Graf | matiasbaezagraf.com" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			</Head>
+
 			<div className="flex flex-col items-center min-h-screen bg-[#292929]">
 				<h1 className="text-3xl font-bold pt-[20px] text-white">
 					{router.query.camera}
 				</h1>
+
 				<div
 					id="video"
 					className="relative border-[1px] border-[#222222] my-[20px] w-[800px] h-[450px]"

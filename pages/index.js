@@ -147,7 +147,7 @@ const Home = () => {
 						return (
 							<iframe
 								key={index}
-								src={`http://${hostname}:${clientPort}/cameras/${camera.name}?stream=${camera.stream}&port=${camera.port}`}
+								src={`https://${hostname}:${clientPort}/cameras/${camera.name}?stream=${camera.stream}&port=${camera.port}`}
 								className={`desktop:h-[92vh] h-[90vh] ${
 									currentCamera !== camera && "hidden"
 								}`}
